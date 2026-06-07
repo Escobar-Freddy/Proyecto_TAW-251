@@ -20,6 +20,8 @@ async function bootstrap() {
   
   // Middleware global para capturar IP y browser
   app.use(new LoggerMiddleware().use);
+
+  app.enableCors({ origin: process.env.FRONTEND_URL });
   
   // Validaciones globales
   app.useGlobalPipes(new ValidationPipe({
@@ -32,6 +34,8 @@ async function bootstrap() {
   await app.listen(3000, '0.0.0.0');
   console.log(`Servidor corriendo en http://localhost:3000`);
   console.log(`Frontend en http://localhost:8080`);
+
+
 }
 
 bootstrap();
