@@ -1,10 +1,9 @@
 import axios from "axios";
 
-// Vite usa VITE_ como prefijo para variables de entorno
-// En desarrollo: .env.local con VITE_BACKEND_URL=http://localhost:3000
-// En producción: Render con variable VITE_BACKEND_URL=https://proyecto-taw-251.onrender.com
-const API_BASE_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+// 🔒 URL hardcodeada directamente al backend en Render
+const API_BASE_URL = "https://proyecto-taw-251.onrender.com";
+
+console.log("🔗 Backend URL configurada:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
