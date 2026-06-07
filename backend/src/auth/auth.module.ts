@@ -18,9 +18,9 @@ import { RolesGuard } from './guards/roles.guard';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        secret: configService.get('JWT_SECRET') || 'miClaveSecretaPorDefecto123',
         signOptions: {
-          expiresIn: configService.get('JWT_EXPIRES_IN'),
+          expiresIn: configService.get('JWT_EXPIRES_IN') || '1d', // ✅ Valor por defecto '1d'
         },
       }),
       inject: [ConfigService],
@@ -31,7 +31,6 @@ import { RolesGuard } from './guards/roles.guard';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
-  // ✅ Exportar JwtModule en lugar de JwtService directamente
   exports: [JwtStrategy, PassportModule, JwtModule, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}
