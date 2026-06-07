@@ -1,8 +1,11 @@
 import axios from "axios";
 
-//const API_BASE_URL = "http://localhost:3000";
+// Vite usa VITE_ como prefijo para variables de entorno
+// En desarrollo: .env.local con VITE_BACKEND_URL=http://localhost:3000
+// En producción: Render con variable VITE_BACKEND_URL=https://proyecto-taw-251.onrender.com
 const API_BASE_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:3000";
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
