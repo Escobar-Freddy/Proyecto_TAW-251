@@ -1,10 +1,18 @@
-# Usa Nginx para servir archivos estáticos
 FROM nginx:alpine
 
-# Copiar los archivos del frontend al directorio de Nginx
-COPY . /usr/share/nginx/html
+# Eliminar configuración por defecto
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Exponer puerto 80
+# Copiar configuración personalizada
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiar archivos compilados
+COPY dist /usr/share/nginx/html
+
+# Verificar que los archivos existen
+RUN ls -la /usr/share/nginx/html && \
+    ls -la /usr/share/nginx/html/assets || true
+
 EXPOSE 80
 
-# Nginx se inicia automáticamente
+CMD ["nginx", "-g", "daemon off;"]

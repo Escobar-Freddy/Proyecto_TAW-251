@@ -1,57 +1,57 @@
-version: "3.8"
-
 services:
-  postgres:
-    image: postgres:18-alpine
-    container_name: proyecto_taw_postgres
-    restart: always
+  # pgAdmin para administrar tu PostgreSQL local
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: proyecto_taw_pgadmin
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234567
-      POSTGRES_DB: tesoreria
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
-      - "5433:5432" # Usa 5433 para no chocar con otro PostgreSQL local
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "5050:80"
+    networks:
+      - proyecto-network
+    profiles:
+      - with-pgadmin
 
+  # Backend de NestJS
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: proyecto_taw_backend
-    restart: always
     environment:
+      # Conexión a tu PostgreSQL LOCAL (en Windows)
+      DB_HOST: host.docker.internal # Apunta a tu máquina host
+      DB_PORT: 5432 # Puerto de PostgreSQL en tu Windows
+      DB_USER: postgres
+      DB_PASS: 1234567 # Tu contraseña
+      DB_NAME: tesoreria_bd # Tu base de datos
       NODE_ENV: production
       PORT: 3000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASS: 1234567
-      DB_NAME: tesoreria
     ports:
       - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Necesario para Windows
+    networks:
+      - proyecto-network
+    restart: unless-stopped
 
+  # Frontend (si también está en Docker)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: proyecto_taw_frontend
-    restart: always
+    environment:
+      API_URL: http://localhost:3000 # O usa backend:3000 si están en misma red
     ports:
       - "8080:80"
+    networks:
+      - proyecto-network
     depends_on:
       - backend
+    restart: unless-stopped
 
-volumes:
-  postgres_data:
+networks:
+  proyecto-network:
+    driver: bridge
